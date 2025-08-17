@@ -1,2 +1,2 @@
-to improve results, we should use stronger models like EfficientNet7
+to improve results, we should use stronger models like EfficientNet7(it needs more time and GPU usage to train and I do not have access to GPU anymore to train it)
 also my dataset had some problems in labeling and some images was too blur and they had effects on my results
