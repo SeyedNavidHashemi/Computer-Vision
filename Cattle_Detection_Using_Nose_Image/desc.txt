@@ -1,1 +1,2 @@
-
+to improve results, we should use stronger models like EfficientNet7
+also my dataset had some problems in labeling and some images was too blur and they had effects on my results
