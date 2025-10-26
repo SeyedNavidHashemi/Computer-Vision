@@ -43,31 +43,21 @@ This project implements an automated system for counting broiler chickens in far
 
 ## 📊 Dataset
 
+The notebooks use a custom broiler chicken dataset with the following characteristics:
 - **Dataset Format**: COCO JSON annotations converted to YOLO format
 - **Splits**: Train, Validation, and Test sets
 - **Classes**: Single class (chicken)
 - **Images**: 162 test images with 845 total instances
 - **Annotation Type**: Instance segmentation masks
 - **Format**: YOLO format with normalized polygon coordinates
+- **Note**: Dataset files are not included in this repository but can be obtained from standard COCO format poultry detection datasets
 
 ## 📁 Project Structure
 
-```
-BroilerCounting/
-├── BroilerCounting.ipynb                     # YOLOv8 Instance Segmentation training & evaluation
-├── BroilerCounting(ObjectDetection).ipynb    # YOLOv8 Object Detection alternative approach
-├── download_videos_from_youtube.py           # Video extraction utility
-├── chicken_frames/                          # Extracted frames from videos
-├── chicken_frames_cropped/                  # Cropped frames for processing
-├── chicken_videos/                          # Source video files
-├── results_for_counting_with_YOLO-v8/       # Counting model results
-│   ├── output_filtered_masks0.85/          # Results with 0.85 confidence threshold
-│   ├── output_filtered_masks0.89/          # Results with 0.89 confidence threshold
-│   └── test_evaluation_run/                # Evaluation metrics and visualizations
-└── results_for_growth_curve_with_YOLO-v8/   # Growth monitoring results
-    ├── general_prediction_on_the_test_set/
-    └── test_evaluation_run/
-```
+This repository contains two main Jupyter notebooks implementing different approaches:
+
+- `BroilerCounting.ipynb` - YOLOv8 Instance Segmentation training & evaluation
+- `BroilerCounting(ObjectDetection).ipynb` - YOLOv8 Object Detection alternative approach
 
 ## 📈 Model Performance
 
@@ -115,132 +105,60 @@ all         14        103       0.969      0.961      0.989      0.869
 - **mAP@0.5**: 98.9%
 - **mAP@0.5-0.95**: 86.9%
 
-## 🚀 Usage
+## 🚀 Getting Started
 
-### Training
+### Requirements
 
-1. **For Instance Segmentation:**
-
-```python
-from ultralytics import YOLO
-
-# Load YOLOv8s-seg model
-model = YOLO('yolov8s-seg.pt')
-
-# Train the model
-results = model.train(
-    data='data.yaml',
-    epochs=100,
-    imgsz=640,
-    batch=16,
-    patience=50
-)
+1. Install required dependencies:
+```bash
+pip install ultralytics opencv-python numpy matplotlib pillow pyyaml
 ```
 
-2. **For Object Detection:**
+2. For Google Colab usage, run the notebooks directly - all dependencies will be installed automatically.
+
+### Running the Notebooks
+
+1. **Instance Segmentation Approach** (`BroilerCounting.ipynb`):
+   - Open the notebook in Google Colab or Jupyter
+   - Follow the cells sequentially to train YOLOv8s-seg model
+   - Includes data preparation, training, inference, and evaluation
+
+2. **Object Detection Approach** (`BroilerCounting(ObjectDetection).ipynb`):
+   - Open the notebook in Google Colab or Jupyter
+   - Train YOLOv8n model for object detection
+   - Includes training, validation, and interactive inference with image upload
+
+### Quick Start Example
 
 ```python
 from ultralytics import YOLO
 
-# Load YOLOv8n model
-model = YOLO('yolov8n.pt')
-
-# Train the model
-results = model.train(data='data.yaml', epochs=50, imgsz=640)
-```
-
-### Inference
-
-```python
-from ultralytics import YOLO
-
-# Load trained model
-model = YOLO('best.pt')
+# Load pre-trained or trained model
+model = YOLO('yolov8s-seg.pt')  # or 'best.pt' after training
 
 # Run inference
 results = model.predict(
-    source='path/to/images',
-    conf=0.89,  # Confidence threshold
-    save=True,
-    show_boxes=True,
-    show_labels=True
+    source='path/to/chicken/images',
+    conf=0.89,
+    save=True
 )
 
-# Count detected chickens
+# Get count
 chicken_count = len(results[0].boxes)
-print(f"Chickens detected: {chicken_count}")
-```
-
-### Evaluation
-
-```python
-# Evaluate on test set
-results = model.val(
-    data='data.yaml',
-    split='test',
-    imgsz=640,
-    batch=16,
-    plots=True
-)
+print(f"Detected {chicken_count} chickens")
 ```
 
 ## 🎨 Results
 
 The model successfully predicts chicken instances across various scenarios:
 
-### Example Predictions
+### Key Results Achieved
 
 The system demonstrates robust performance in:
 - **Dense populations**: Accurately counts chickens in crowded conditions
 - **Partial occlusion**: Handles overlapping and partially hidden chickens
 - **Varied lighting**: Adapts to different illumination conditions
 - **Different scales**: Detects chickens at various sizes
-
-#### Sample Detection Results
-
-![Sample Detection 1](results_for_counting_with_YOLO-v8/output_filtered_masks0.89/000000000018_jpg.rf.48cbc904f3f968230adf1edea8140d39.jpg)
-
-![Sample Detection 2](results_for_counting_with_YOLO-v8/output_filtered_masks0.89/000000000056_jpg.rf.7298a461ff68eab650ae921c6c30d507.jpg)
-
-![Sample Detection 3](results_for_counting_with_YOLO-v8/output_filtered_masks0.89/000000000089_jpg.rf.70db9f2e9176f4bdc6ecee5199bd2db2.jpg)
-
-![Sample Detection 4](results_for_counting_with_YOLO-v8/output_filtered_masks0.89/000000000095_jpg.rf.c7ef0118ac922e29fee82b9e5d5a5375.jpg)
-
-![Sample Detection 5](results_for_counting_with_YOLO-v8/output_filtered_masks0.89/000000000976_jpg.rf.68da79ca39e3e23df627653ed8d22e53.jpg)
-
-### Evaluation Metrics Visualization
-
-Results include comprehensive evaluation metrics and visualizations:
-
-#### Confusion Matrix
-![Confusion Matrix](results_for_counting_with_YOLO-v8/test_evaluation_run/confusion_matrix_normalized.png)
-
-#### Precision-Recall Curves
-![Box Precision-Recall Curve](results_for_counting_with_YOLO-v8/test_evaluation_run/BoxPR_curve.png)
-
-![Mask Precision-Recall Curve](results_for_counting_with_YOLO-v8/test_evaluation_run/MaskPR_curve.png)
-
-#### F1 Score Curves
-![Box F1 Curve](results_for_counting_with_YOLO-v8/test_evaluation_run/BoxF1_curve.png)
-
-![Mask F1 Curve](results_for_counting_with_YOLO-v8/test_evaluation_run/MaskF1_curve.png)
-
-#### Validation Batch Comparisons
-
-**Ground Truth vs Predictions - Batch 0:**
-![Validation Batch 0 Labels](results_for_counting_with_YOLO-v8/test_evaluation_run/val_batch0_labels.jpg)
-
-![Validation Batch 0 Predictions](results_for_counting_with_YOLO-v8/test_evaluation_run/val_batch0_pred.jpg)
-
-**Ground Truth vs Predictions - Batch 1:**
-![Validation Batch 1 Labels](results_for_counting_with_YOLO-v8/test_evaluation_run/val_batch1_labels.jpg)
-
-![Validation Batch 1 Predictions](results_for_counting_with_YOLO-v8/test_evaluation_run/val_batch1_pred.jpg)
-
-**Ground Truth vs Predictions - Batch 2:**
-![Validation Batch 2 Labels](results_for_counting_with_YOLO-v8/test_evaluation_run/val_batch2_labels.jpg)
-
-![Validation Batch 2 Predictions](results_for_counting_with_YOLO-v8/test_evaluation_run/val_batch2_pred.jpg)
 
 ### Output Formats
 
@@ -279,9 +197,36 @@ pillow>=7.1.2
 pyyaml>=5.3.1
 ```
 
-## 📄 License
+## 📓 Notebook Details
 
-This project is developed for research and educational purposes.
+### BroilerCounting.ipynb (Instance Segmentation)
+This notebook implements instance segmentation for precise chicken identification:
+- **Model**: YOLOv8s-seg
+- **Training**: 100 epochs with early stopping (patience=50)
+- **Key Features**: 
+  - COCO to YOLO conversion
+  - Confidence filtering (0.85, 0.89 thresholds)
+  - Comprehensive evaluation metrics
+  - Batch processing and visualization
+
+### BroilerCounting(ObjectDetection).ipynb (Object Detection)
+This notebook implements object detection for chicken counting:
+- **Model**: YOLOv8n (nano version for speed)
+- **Training**: 50 epochs
+- **Key Features**:
+  - Interactive image upload and inference
+  - Real-time visualization with bounding boxes
+  - Custom confidence score display
+  - Easy-to-use chicken count output
+
+## 🔬 Technical Approach
+
+The project employs two complementary approaches:
+
+1. **Instance Segmentation**: Provides pixel-level accuracy for precise chicken boundary detection
+2. **Object Detection**: Offers faster inference with bounding box localization
+
+Both approaches achieve excellent accuracy (>97% mAP), allowing users to choose based on their specific needs and computational resources.
 
 ## 👨‍💻 Development
 
@@ -291,8 +236,13 @@ The project was developed using:
 - **COCO to YOLO** annotation conversion for dataset preparation
 - **Custom confidence filtering** for optimal precision-recall balance
 
+## 📄 License
+
+This project is available for educational and research purposes.
+
 ---
 
 **Note**: This project demonstrates the application of state-of-the-art computer vision techniques to solve real-world problems in poultry farming, combining deep learning with practical agricultural needs.
 
+**Keywords**: YOLOv8, Computer Vision, Deep Learning, Instance Segmentation, Object Detection, Poultry Counting, Agricultural AI, Automated Counting System
 
