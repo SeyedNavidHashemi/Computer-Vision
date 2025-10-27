@@ -121,8 +121,12 @@ This project implements sophisticated inpainting algorithms capable of restoring
 - Integration with virtual and augmented reality applications
 
 ## Team Members
-Seyed Mohammad Hossein Mozaheri
 Seyed Navid Hashemi Jazi
+
+
+Seyed Mohammad Hossein Mozaheri
+
+
 Seyed Mohammad Jazayeri
 
 ## Academic Context
